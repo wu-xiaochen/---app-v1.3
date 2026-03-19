@@ -250,14 +250,14 @@ const ProjectBackgroundCard = () => (
   </Card>
 );
 
-const BOMAnalysisCard = ({ onConfirm }: { onConfirm: () => void }) => (
+const BOMAnalysisCard = ({ onConfirm, isAuto }: { onConfirm: () => void, isAuto?: boolean }) => (
   <Card className="mt-2 border-blue-100 shadow-lg overflow-hidden">
     <div className="p-4 bg-blue-900 text-white">
       <div className="flex items-center gap-2 mb-3">
         <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
           <Zap size={14} className="text-blue-100" />
         </div>
-        <span className="font-bold text-sm tracking-tight">初步需求确认：我已精准捕捉您的BOM全量诉求</span>
+        <span className="font-bold text-sm tracking-tight">业务解析：BOM 清单深度解析</span>
       </div>
       <p className="text-[12px] leading-relaxed font-medium text-blue-50">
         “我已深度解析您的《管网配套BOM清单》，共识别 <span className="text-blue-300 font-bold">45</span> 项物资。我将基于<span className="text-white font-bold underline decoration-blue-300/50 underline-offset-4 mx-0.5">项目全局工况</span>，为您自动对冲隐性风险，并锁定核心能力标尺。”
@@ -306,7 +306,9 @@ const BOMAnalysisCard = ({ onConfirm }: { onConfirm: () => void }) => (
         </p>
       </div>
 
-      <ButtonSolid onClick={onConfirm} className="w-full bg-blue-600 hover:bg-blue-700 py-2 mt-2 text-[11px] font-bold">确认解析结果，进入场景定义</ButtonSolid>
+      {!isAuto && (
+        <ButtonSolid onClick={onConfirm} className="w-full bg-blue-600 hover:bg-blue-700 py-2 mt-2 text-[11px] font-bold">确认解析结果，进入场景定义</ButtonSolid>
+      )}
     </div>
   </Card>
 );
@@ -503,7 +505,7 @@ const Step1ConfirmCard = ({ households, usage, business1, business2, onConfirm }
         </div>
 
         {!confirmed && (
-          <ButtonSolid className="w-full mt-2" onClick={() => { setConfirmed(true); onConfirm(); }}>确认初步需求，进行需求仿真</ButtonSolid>
+          <ButtonSolid className="w-full mt-2 uppercase tracking-widest" onClick={() => { setConfirmed(true); onConfirm(); }}>确认初步需求，进行需求增强</ButtonSolid>
         )}
       </div>
     </Card>
@@ -854,7 +856,7 @@ const Step3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => {
           </AnimatePresence>
         </div>
 
-        <ButtonSolid onClick={() => onNext(config)} disabled={isCalculating || !showResult} className="py-3.5 text-sm">确认仿真结果并共识</ButtonSolid>
+        <ButtonSolid onClick={() => onNext(config)} disabled={isCalculating || !showResult} className="py-3.5 text-sm uppercase tracking-widest">确认仿真结果，生成需求说明书</ButtonSolid>
       </div>
     </Card>
   );
@@ -1102,7 +1104,7 @@ const GlobalScenarioCard = ({ onConfirm }: { onConfirm: (s: ScenarioState) => vo
           <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
             <Search size={14} className="text-blue-100" />
           </div>
-          <span className="font-bold text-sm tracking-tight">初步需求确认：项目全局工况提取</span>
+          <span className="font-bold text-sm tracking-tight">场景定义：全局环境约束提取</span>
         </div>
         <p className="text-[12px] leading-relaxed font-medium text-blue-50">
           “我已从项目背景中提取出全局环境约束。这些约束将作为<span className="text-white font-bold underline decoration-blue-300/50 underline-offset-4 mx-0.5">推演基准</span>，批量映射至BOM清单中的每一项物资。”
@@ -1170,7 +1172,7 @@ const GlobalScenarioCard = ({ onConfirm }: { onConfirm: (s: ScenarioState) => vo
               </div>
             </label>
           </div>
-          <ButtonSolid onClick={() => onConfirm(scenarios)} className="w-full bg-blue-600 hover:bg-blue-700 py-3 mt-4 text-[12px] font-bold shadow-lg shadow-blue-100">确认初步需求，进行需求仿真</ButtonSolid>
+          <ButtonSolid onClick={() => onConfirm(scenarios)} className="w-full bg-blue-600 hover:bg-blue-700 py-3 mt-4 text-[12px] font-bold shadow-lg shadow-blue-100 uppercase tracking-widest">确认环境约束，进行需求增强</ButtonSolid>
         </div>
       </div>
     </Card>
@@ -1261,7 +1263,7 @@ const ReviewItemCard = ({
   );
 };
 
-const UnifiedReviewDashboard = ({ scenarios, onConfirm }: { scenarios: ScenarioState, onConfirm: () => void }) => {
+const UnifiedReviewDashboard = ({ scenarios, onConfirm, isAuto }: { scenarios: ScenarioState, onConfirm: () => void, isAuto?: boolean }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [viewMode, setViewMode] = useState<'business' | 'technical'>('business');
   
@@ -1300,7 +1302,7 @@ const UnifiedReviewDashboard = ({ scenarios, onConfirm }: { scenarios: ScenarioS
             <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
               <GitMerge size={14} className="text-blue-100" />
             </div>
-            <span className="font-bold text-sm tracking-tight">逻辑推演：需求能力全局视图</span>
+            <span className="font-bold text-sm tracking-tight">行业专家知识模型：需求增强</span>
           </div>
           <div className="flex bg-white/10 p-0.5 rounded-lg border border-white/20 backdrop-blur-sm">
             <button 
@@ -1318,9 +1320,9 @@ const UnifiedReviewDashboard = ({ scenarios, onConfirm }: { scenarios: ScenarioS
           </div>
         </div>
         <div className="bg-blue-500/20 border border-blue-400/30 p-3 rounded-xl">
-          <div className="text-[10px] font-bold text-blue-200 mb-1 uppercase tracking-widest">全局逻辑推演结论</div>
+          <div className="text-[10px] font-bold text-blue-200 mb-1 uppercase tracking-widest">专家知识增强结论</div>
           <p className="text-xs leading-relaxed text-blue-50">
-            “基于您的项目背景，我已将业务诉求转化为<span className="text-blue-300 font-bold"> 6 项核心能力 </span>。您的意图已被精准理解：重点解决老旧小区<span className="text-white font-bold">‘空间受限’</span>与<span className="text-white font-bold">‘极寒供暖保障’</span>之间的矛盾。”
+            “基于您的项目背景，我已通过行业专家模型为您注入了<span className="text-blue-300 font-bold"> 6 项核心能力 </span>。您的意图已被精准理解：重点解决老旧小区<span className="text-white font-bold">‘空间受限’</span>与<span className="text-white font-bold">‘极寒供暖保障’</span>之间的矛盾。”
           </p>
         </div>
       </div>
@@ -1388,12 +1390,14 @@ const UnifiedReviewDashboard = ({ scenarios, onConfirm }: { scenarios: ScenarioS
           </Accordion>
         ))}
 
-        <ButtonSolid 
-          className="w-full mt-2 py-3 bg-blue-600 hover:bg-blue-700 shadow-lg text-[12px] font-black tracking-widest uppercase" 
-          onClick={onConfirm}
-        >
-          确认逻辑推演，进入需求仿真
-        </ButtonSolid>
+        {!isAuto && (
+          <ButtonSolid 
+            className="w-full mt-2 py-3 bg-blue-600 hover:bg-blue-700 shadow-lg text-[12px] font-black tracking-widest uppercase" 
+            onClick={onConfirm}
+          >
+            确认需求增强，进入需求仿真
+          </ButtonSolid>
+        )}
       </div>
     </Card>
   );
@@ -1783,7 +1787,7 @@ const BOMStep3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => 
           </AnimatePresence>
         </div>
 
-        <ButtonSolid onClick={() => onNext(config)} disabled={isCalculating || !showResult} className="w-full py-4 text-sm font-black tracking-widest uppercase shadow-blue-200 shadow-lg">确认仿真结果并共识</ButtonSolid>
+        <ButtonSolid onClick={() => onNext(config)} disabled={isCalculating || !showResult} className="w-full py-4 text-sm font-black tracking-widest uppercase shadow-blue-200 shadow-lg">确认仿真结果，生成需求说明书</ButtonSolid>
 
       </div>
     </Card>
@@ -2230,6 +2234,7 @@ const AgentThinkingFlow = ({
   steps: { 
     id: string, 
     label: string, 
+    isAuto?: boolean,
     render?: (close: () => void, next: () => void) => React.ReactNode 
   }[], 
   onComplete: () => void, 
@@ -2247,14 +2252,20 @@ const AgentThinkingFlow = ({
 
   useEffect(() => {
     if (currentStepIdx < steps.length) {
-      const timer = setTimeout(() => {
-        next();
-      }, 1200);
-      return () => clearTimeout(timer);
+      const currentStep = steps[currentStepIdx];
+      if (currentStep.isAuto) {
+        const timer = setTimeout(() => {
+          next();
+        }, 1800); // Slightly longer for "thinking" feel
+        return () => clearTimeout(timer);
+      } else {
+        // Automatically expand manual steps to prompt user action
+        setExpandedStepId(currentStep.id);
+      }
     } else if (currentStepIdx === steps.length) {
       onComplete();
     }
-  }, [currentStepIdx, steps.length, onComplete, next]);
+  }, [currentStepIdx, steps, onComplete, next]);
 
   const expandedStep = steps.find(s => s.id === expandedStepId);
 
@@ -2297,21 +2308,14 @@ const AgentThinkingFlow = ({
                       <div className="flex gap-2">
                         <button 
                           onClick={() => setExpandedStepId(step.id)}
-                          className="text-[9px] text-blue-500 hover:underline font-medium"
+                          className={`text-[9px] font-medium px-2 py-0.5 rounded-full transition-all ${
+                            isLoading && !step.isAuto 
+                              ? 'bg-blue-600 text-white shadow-sm animate-bounce' 
+                              : 'text-blue-500 hover:bg-blue-50'
+                          }`}
                         >
-                          查看详情
+                          {isLoading && !step.isAuto ? '点击处理' : '查看详情'}
                         </button>
-                        {isCompleted && (
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onStepClick?.(step.id);
-                            }}
-                            className="text-[9px] text-gray-400 hover:text-blue-500 flex items-center gap-0.5 font-medium"
-                          >
-                            <RefreshCw size={8} /> 重推
-                          </button>
-                        )}
                       </div>
                     )}
                   </div>
@@ -2407,16 +2411,19 @@ export default function App() {
               { 
                 id: 'confirm', 
                 label: '初步需求确认',
+                isAuto: false,
                 render: (close: () => void, next: () => void) => <Step1ConfirmCard households={households} usage={usage} business1={business1} business2={business2} onConfirm={next} />
               },
               { 
                 id: 'logic', 
-                label: '需求能力全局视图',
-                render: (close: () => void, next: () => void) => <UnifiedReviewDashboard scenarios={{ cold: true, noise: false, underground: false, power: true }} onConfirm={next} />
+                label: '需求增强',
+                isAuto: true,
+                render: (close: () => void, next: () => void) => <UnifiedReviewDashboard scenarios={{ cold: true, noise: false, underground: false, power: true }} onConfirm={next} isAuto={true} />
               },
               { 
                 id: 'simulation', 
                 label: '需求仿真',
+                isAuto: false,
                 render: (close: () => void, next: () => void) => <Step3Card onNext={next} />
               }
             ];
@@ -2489,21 +2496,25 @@ export default function App() {
       { 
         id: 'bom_parse', 
         label: 'BOM 清单深度解析',
-        render: (close: () => void, next: () => void) => <BOMAnalysisCard onConfirm={next} />
+        isAuto: true,
+        render: (close: () => void, next: () => void) => <BOMAnalysisCard onConfirm={next} isAuto={true} />
       },
       { 
         id: 'scenario_map', 
         label: '全局环境约束提取',
+        isAuto: false,
         render: (close: () => void, next: () => void) => <GlobalScenarioCard onConfirm={next} />
       },
       { 
         id: 'logic_deduction', 
-        label: '需求能力全局视图',
-        render: (close: () => void, next: () => void) => <UnifiedReviewDashboard scenarios={{ cold: true, noise: true, underground: false, power: true }} onConfirm={next} />
+        label: '需求增强',
+        isAuto: true,
+        render: (close: () => void, next: () => void) => <UnifiedReviewDashboard scenarios={{ cold: true, noise: true, underground: false, power: true }} onConfirm={next} isAuto={true} />
       },
       { 
         id: 'simulation', 
         label: '需求仿真',
+        isAuto: false,
         render: (close: () => void, next: () => void) => <BOMStep3Card onNext={next} />
       }
     ];
