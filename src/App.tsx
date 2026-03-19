@@ -703,7 +703,7 @@ const Step3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => {
       </div>
       <div className="p-4">
         <div className="w-full h-56 bg-blue-50 rounded-xl mb-4 relative flex items-center justify-center border border-blue-100 overflow-hidden shadow-inner">
-          <div className="absolute inset-0 z-10">
+          <div className="z-10 w-full h-full">
             <Canvas camera={{ position: [3, 2, 4], fov: 45 }}>
               <ambientLight intensity={0.7} />
               <pointLight position={[10, 10, 10]} intensity={1.5} />
@@ -2458,11 +2458,11 @@ export default function App() {
                                 </div>
                                 <div>
                                   <div className="text-sm font-bold text-blue-800">需求已成功发布</div>
-                                  <div className="text-[10px] text-blue-600">已同步至供应商协同平台</div>
+                                  <div className="text-[10px] text-blue-600">已发布至需求大厅</div>
                                 </div>
                               </div>
                               <p className="text-xs text-gray-600 leading-relaxed">
-                                您的需求已转化为专业的能力标尺。系统已自动匹配 3 家具备相应能力的优质供应商，并同步发送了需求说明书。
+                                您的需求已转化为专业的能力标尺。正在进行供能力匹配，并同步发送了需求说明书。
                               </p>
                             </div>
                           );
@@ -2543,11 +2543,11 @@ export default function App() {
                           </div>
                           <div>
                             <div className="text-sm font-bold text-blue-800">需求已成功发布</div>
-                            <div className="text-[10px] text-blue-600">已同步至供应商协同平台</div>
+                            <div className="text-[10px] text-blue-600">已发布至需求大厅</div>
                           </div>
                         </div>
                         <p className="text-xs text-gray-600 leading-relaxed">
-                          您的BOM全量需求已转化为专业的能力标尺。系统已自动匹配 5 家具备相应能力的优质供应商，并同步发送了需求说明书。
+                          您的BOM全量需求已转化为专业的能力标尺。正在进行供能力匹配，并同步发送了需求说明书。
                         </p>
                       </div>
                     );
