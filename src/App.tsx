@@ -816,7 +816,7 @@ const Step3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => {
           </div>
         </div>
 
-        <div className="h-44 mb-4">
+        <div className="h-48 mb-4">
           <AnimatePresence mode="wait">
             {isCalculating && (
               <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full flex flex-col items-center justify-center gap-2 text-blue-500">
@@ -834,19 +834,25 @@ const Step3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => {
                 <div className="flex-1 border border-gray-100 rounded-xl bg-white p-3 flex flex-col shadow-sm">
                   <div className="text-[10px] text-gray-400 mb-2 font-black uppercase tracking-widest">TCO 全生命周期成本对比</div>
                   <div className="flex-1 flex items-end gap-3 pt-2 h-24">
-                    <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
-                      <span className="text-[10px] text-blue-600 font-black mb-1">¥{(initialCost/10000).toFixed(1)}万</span>
-                      <div className="w-full bg-blue-500 rounded-t-lg transition-all duration-700" style={{ height: `${initialCostHeight}%` }}></div>
+                    <div className="flex-1 flex flex-col items-center h-full justify-end gap-1">
+                      <span className="text-[10px] text-blue-600 font-black">¥{(initialCost/10000).toFixed(1)}万</span>
+                      <div className="w-full h-16 relative flex items-end">
+                        <div className="w-full bg-blue-500 rounded-t-lg" style={{ height: `${initialCostHeight}%` }}></div>
+                      </div>
                       <span className="text-[9px] text-gray-400 font-bold">初期投入</span>
                     </div>
-                    <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
-                      <span className="text-[10px] text-blue-600 font-black mb-1">¥{(maintCost/10000).toFixed(1)}万</span>
-                      <div className="w-full bg-blue-500 rounded-t-lg transition-all duration-700" style={{ height: `${maintenanceCostHeight}%` }}></div>
+                    <div className="flex-1 flex flex-col items-center h-full justify-end gap-1">
+                      <span className="text-[10px] text-blue-600 font-black">¥{(maintCost/10000).toFixed(1)}万</span>
+                      <div className="w-full h-16 relative flex items-end">
+                        <div className="w-full bg-blue-500 rounded-t-lg" style={{ height: `${maintenanceCostHeight}%` }}></div>
+                      </div>
                       <span className="text-[9px] text-gray-400 font-bold">5年维保</span>
                     </div>
-                    <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
-                      <span className="text-[10px] text-teal-600 font-black mb-1">¥{(timeCost/10000).toFixed(1)}万</span>
-                      <div className="w-full bg-teal-500 rounded-t-lg transition-all duration-700" style={{ height: `${timeCostHeight}%` }}></div>
+                    <div className="flex-1 flex flex-col items-center h-full justify-end gap-1">
+                      <span className="text-[10px] text-teal-600 font-black">¥{(timeCost/10000).toFixed(1)}万</span>
+                      <div className="w-full h-16 relative flex items-end">
+                        <div className="w-full bg-teal-500 rounded-t-lg" style={{ height: `${timeCostHeight}%` }}></div>
+                      </div>
                       <span className="text-[9px] text-gray-400 font-bold">风险/损失</span>
                     </div>
                   </div>
@@ -1838,7 +1844,7 @@ const BOMStep3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => 
           </div>
         </div>
 
-        <div className="h-24 mb-4">
+        <div className="h-48 mb-4">
           <AnimatePresence mode="wait">
             {isCalculating && (
               <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full flex flex-col items-center justify-center gap-2 text-blue-500">
@@ -1851,19 +1857,25 @@ const BOMStep3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => 
                 <div className="flex-1 border border-gray-100 rounded-2xl bg-white p-3 flex flex-col shadow-sm">
                   <div className="text-[10px] text-gray-400 mb-2 font-black uppercase tracking-widest">BOM 全生命周期成本 (TCO) 预测</div>
                   <div className="flex-1 flex items-end gap-3 pt-2 h-24">
-                    <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
-                      <span className="text-[10px] text-blue-600 font-black mb-1">¥{(initialCost/10000).toFixed(1)}万</span>
-                      <div className="w-full bg-blue-500 rounded-t-lg transition-all duration-700" style={{ height: `${initialCostHeight}%` }}></div>
+                    <div className="flex-1 flex flex-col items-center h-full justify-end gap-1">
+                      <span className="text-[10px] text-blue-600 font-black">¥{(initialCost/10000).toFixed(1)}万</span>
+                      <div className="w-full h-16 relative flex items-end">
+                        <div className="w-full bg-blue-500 rounded-t-lg" style={{ height: `${initialCostHeight}%` }}></div>
+                      </div>
                       <span className="text-[9px] text-gray-400 font-bold">初期投入</span>
                     </div>
-                    <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
-                      <span className="text-[10px] text-blue-600 font-black mb-1">¥{(maintCost/10000).toFixed(1)}万</span>
-                      <div className="w-full bg-blue-400 rounded-t-lg transition-all duration-700" style={{ height: `${maintenanceCostHeight}%` }}></div>
+                    <div className="flex-1 flex flex-col items-center h-full justify-end gap-1">
+                      <span className="text-[10px] text-blue-600 font-black">¥{(maintCost/10000).toFixed(1)}万</span>
+                      <div className="w-full h-16 relative flex items-end">
+                        <div className="w-full bg-blue-400 rounded-t-lg" style={{ height: `${maintenanceCostHeight}%` }}></div>
+                      </div>
                       <span className="text-[9px] text-gray-400 font-bold">3年运维</span>
                     </div>
-                    <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
-                      <span className="text-[10px] text-teal-600 font-black mb-1">¥{(timeCost/10000).toFixed(1)}万</span>
-                      <div className="w-full bg-teal-500 rounded-t-lg transition-all duration-700" style={{ height: `${timeCostHeight}%` }}></div>
+                    <div className="flex-1 flex flex-col items-center h-full justify-end gap-1">
+                      <span className="text-[10px] text-teal-600 font-black">¥{(timeCost/10000).toFixed(1)}万</span>
+                      <div className="w-full h-16 relative flex items-end">
+                        <div className="w-full bg-teal-500 rounded-t-lg" style={{ height: `${timeCostHeight}%` }}></div>
+                      </div>
                       <span className="text-[9px] text-gray-400 font-bold">风险/损失</span>
                     </div>
                   </div>
