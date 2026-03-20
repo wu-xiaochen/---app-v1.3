@@ -19,7 +19,7 @@ interface ScenarioState {
 
 const TCOTrustPopup = ({ onClose }: { onClose: () => void }) => {
   const data = [
-    { name: '初期采购', low: 100, smart: 115 },
+    { name: '初期投入', low: 100, smart: 115 },
     { name: '3年运维', low: 60, smart: 20 },
     { name: '故障风险', low: 40, smart: 5 },
     { name: '总成本', low: 200, smart: 140 },
@@ -181,7 +181,7 @@ const PreJourneyCard = ({ onConfirm }: { onConfirm: () => void }) => (
     </div>
     <div className="p-2">
       <p className="text-[10px] text-gray-600 mb-2 leading-relaxed">
-        基于您的项目台账与历史采购行为，需智已提前预测您的供应链意图：
+        基于您的项目台账与历史业务行为，需智已提前预测您的业务意图：
       </p>
       
       <div className="bg-white border border-gray-100 rounded-lg p-2 mb-2 space-y-1.5 shadow-sm">
@@ -317,7 +317,7 @@ const ChatPromptHouseholds = ({ onSelect }: { onSelect: (val: string) => void })
   const [selected, setSelected] = useState(false);
   return (
     <div>
-      <p className="text-sm mb-2">收到！为老旧小区改造采购10台燃气调压箱。作为您的业务辅助大脑，我已调取《城镇燃气设计规范》。为了帮您精准推算设备能力，请问<strong>每个调压箱大约覆盖多少户居民</strong>？</p>
+      <p className="text-sm mb-2">收到！为老旧小区改造需求 10 台燃气调压箱。作为您的业务辅助大脑，我已调取《城镇燃气设计规范》。为了帮您精准推算设备能力，请问<strong>每个调压箱大约覆盖多少户居民</strong>？</p>
       {!selected && (
         <div className="flex gap-2 mt-2">
           <ButtonOutline color="blue" onClick={() => { setSelected(true); onSelect("约300户"); }}>约300户</ButtonOutline>
@@ -837,7 +837,7 @@ const Step3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => {
                     <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                       <span className="text-[10px] text-blue-600 font-black mb-1">¥{(initialCost/10000).toFixed(1)}万</span>
                       <div className="w-full bg-blue-500 rounded-t-lg transition-all duration-700" style={{ height: `${initialCostHeight}%` }}></div>
-                      <span className="text-[9px] text-gray-400 font-bold">初期采购</span>
+                      <span className="text-[9px] text-gray-400 font-bold">初期投入</span>
                     </div>
                     <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                       <span className="text-[10px] text-blue-600 font-black mb-1">¥{(maintCost/10000).toFixed(1)}万</span>
@@ -881,8 +881,8 @@ const Step4Card = ({ config, onPreviewSOP, onConfirm }: { config: ConfigState, o
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex bg-white/80 backdrop-blur-sm rounded-lg p-0.5 border border-blue-100 mr-2">
-            <button onClick={() => setViewMode('business')} className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all ${viewMode === 'business' ? 'bg-blue-600 shadow-sm text-white' : 'text-blue-600 hover:bg-blue-50'}`}>业务视图</button>
-            <button onClick={() => setViewMode('technical')} className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all ${viewMode === 'technical' ? 'bg-blue-600 shadow-sm text-white' : 'text-blue-600 hover:bg-blue-50'}`}>技术视图</button>
+            <button onClick={() => setViewMode('business')} className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all ${viewMode === 'business' ? 'bg-blue-600 shadow-sm text-white' : 'text-blue-600 hover:bg-blue-50'}`}>正面 (业务能力)</button>
+            <button onClick={() => setViewMode('technical')} className={`px-2.5 py-1 text-[10px] font-bold rounded-md transition-all ${viewMode === 'technical' ? 'bg-blue-600 shadow-sm text-white' : 'text-blue-600 hover:bg-blue-50'}`}>背面 (技术推导)</button>
           </div>
           <ButtonOutline color="blue"><Download size={12} className="mr-1" /> 导出</ButtonOutline>
         </div>
@@ -938,7 +938,7 @@ const Step4Card = ({ config, onPreviewSOP, onConfirm }: { config: ConfigState, o
           </div>
         </div>
         
-        <Accordion title={viewMode === 'business' ? '核心能力定义' : '技术规格参数 (隐式)'} defaultOpen={true}>
+        <Accordion title={viewMode === 'business' ? '核心能力定义 (业务获得感)' : '技术规格参数 (可信依据)'} defaultOpen={true}>
           {viewMode === 'business' ? (
             <div className="space-y-4 text-[11px]">
               <div className="space-y-2">
@@ -1000,7 +1000,7 @@ const Step4Card = ({ config, onPreviewSOP, onConfirm }: { config: ConfigState, o
           ) : (
             <div className="space-y-2 text-xs">
               <div className="flex justify-between"><span className="text-gray-500">物资名称:</span><span className="text-gray-800 font-medium">燃气调压箱</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">采购数量:</span><span className="text-gray-800 font-medium">10 台</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">需求数量:</span><span className="text-gray-800 font-medium">10 台</span></div>
               <div className="flex justify-between"><span className="text-gray-500">设计工作压力:</span><span className="text-gray-800 font-medium">2.0 kPa ±10% (1.8~2.2 kPa)</span></div>
               <div className="flex justify-between"><span className="text-gray-500">稳态调压精度:</span><span className="text-blue-600 font-medium bg-blue-50 px-1 rounded">≤±10%</span></div>
               <div className="flex justify-between"><span className="text-gray-500">管件材质:</span><span className="text-blue-600 font-medium">{config.material > 50 ? '304不锈钢' : '碳钢防腐'}</span></div>
@@ -1035,7 +1035,7 @@ const Step4Card = ({ config, onPreviewSOP, onConfirm }: { config: ConfigState, o
             </div>
             <div className="bg-gray-50 p-2 rounded border border-gray-100">
               <div className="font-semibold text-gray-800 mb-1 flex items-center gap-1"><Activity size={12} className="text-blue-500"/> 价格(TCO)最优策略</div>
-              <div className="text-gray-600">采用一体化防冷凝加热型调压箱。虽初期采购成本增加15%，但规避了冻裂风险，十年维保成本下降30%，全生命周期总账节省12%。</div>
+              <div className="text-gray-600">采用一体化防冷凝加热型调压箱。虽初期投入成本增加 15%，但规避了冻裂风险，十年维保成本下降 30%，全生命周期总账节省 12%。</div>
             </div>
             <div className="bg-gray-50 p-2 rounded border border-gray-100">
               <div className="font-semibold text-gray-800 mb-1 flex items-center gap-1"><Truck size={12} className="text-blue-500"/> 交付最优路径</div>
@@ -1079,6 +1079,92 @@ const Step4Card = ({ config, onPreviewSOP, onConfirm }: { config: ConfigState, o
             <div className="flex justify-between"><span className="text-gray-500">方案B (推荐):</span><span className="text-blue-600 font-medium">一体化防冷凝加热型调压箱 (TCO最优)</span></div>
           </div>
         </Accordion>
+
+        <div className="mt-6 space-y-4">
+          <div className="border border-blue-100 rounded-xl overflow-hidden shadow-sm">
+            <button 
+              onClick={() => setIsCapabilitiesOpen(!isCapabilitiesOpen)}
+              className="w-full p-3 flex justify-between items-center bg-blue-50/50 hover:bg-blue-50 transition-colors"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-bold text-blue-800">
+                <Target size={14} /> 需能力清单 (附件)
+              </div>
+              {isCapabilitiesOpen ? <ChevronUp size={14} className="text-blue-400" /> : <ChevronDown size={14} className="text-blue-400" />}
+            </button>
+            <AnimatePresence>
+              {isCapabilitiesOpen && (
+                <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden bg-white">
+                  <div className="p-3 space-y-3">
+                    <div className="flex items-start gap-3 p-2 border border-blue-50 rounded-xl bg-blue-50/20">
+                      <div className="w-6 h-6 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shrink-0"><Truck size={12} /></div>
+                      <div>
+                        <div className="text-[11px] font-bold text-gray-800">全量物资敏捷履约能力</div>
+                        <div className="text-[10px] text-gray-600 leading-relaxed">具备多品类物资协同排产与到货能力，支持老旧小区复杂环境下的分批次精准交付。</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 p-2 border border-orange-50 rounded-xl bg-orange-50/20">
+                      <div className="w-6 h-6 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 shrink-0"><Zap size={12} /></div>
+                      <div>
+                        <div className="text-[11px] font-bold text-gray-800">复杂工况适配能力</div>
+                        <div className="text-[10px] text-gray-600 leading-relaxed">具备针对极寒、地下、高噪音环境的定制化生产能力，确保全量物资在特殊环境下性能不衰减。</div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 p-2 border border-blue-50 rounded-xl bg-blue-50/20">
+                      <div className="w-6 h-6 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 shrink-0"><ShieldCheck size={12} /></div>
+                      <div>
+                        <div className="text-[11px] font-bold text-gray-800">系统级安全保障能力</div>
+                        <div className="text-[10px] text-gray-600 leading-relaxed">通过全量BOM的逻辑校验，规避压力等级不匹配等系统性风险，保障20年运行安全。</div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div className="border border-blue-100 rounded-xl overflow-hidden shadow-sm">
+            <button 
+              onClick={() => setIsValueOpen(!isValueOpen)}
+              className="w-full p-3 flex justify-between items-center bg-blue-50/50 hover:bg-blue-50 transition-colors"
+            >
+              <div className="flex items-center gap-2 text-[11px] font-bold text-blue-800">
+                <ShieldCheck size={14} /> 客户价值表 (附件)
+              </div>
+              {isValueOpen ? <ChevronUp size={14} className="text-blue-400" /> : <ChevronDown size={14} className="text-blue-400" />}
+            </button>
+            <AnimatePresence>
+              {isValueOpen && (
+                <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden bg-white">
+                  <div className="p-3">
+                    <table className="w-full text-[10px] border-collapse">
+                      <thead>
+                        <tr className="bg-blue-50 text-blue-800">
+                          <th className="border border-blue-100 p-2 text-left">价值维度</th>
+                          <th className="border border-blue-100 p-2 text-left">客户价值</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border border-blue-100 p-2 font-bold text-gray-800">安全与稳定</td>
+                          <td className="border border-blue-100 p-2 text-gray-600">全系统机理兼容，确保老旧小区改造后 20 年运行无重大安全隐患。</td>
+                        </tr>
+                        <tr>
+                          <td className="border border-blue-100 p-2 font-bold text-gray-800">经济与运维</td>
+                          <td className="border border-blue-100 p-2 text-gray-600">智能远传减少 90% 人工抄表成本，预防性维护降低 40% 突发故障率。</td>
+                        </tr>
+                        <tr>
+                          <td className="border border-blue-100 p-2 font-bold text-gray-800">社会与品牌</td>
+                          <td className="border border-blue-100 p-2 text-gray-600">极速响应与静音设计，打造“民生工程”标杆，提升企业社会信誉。</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
         <ButtonSolid onClick={onConfirm} className="w-full mt-6 bg-blue-600 hover:bg-blue-700 shadow-lg py-3 text-[13px] font-black tracking-widest uppercase">
           发布需求
         </ButtonSolid>
@@ -1460,7 +1546,7 @@ const SOPDetailView = ({ onClose }: { onClose: () => void }) => {
               <ShieldCheck size={10} /> 验收核心原则
             </div>
             <p className="text-[8px] text-blue-100 leading-relaxed">
-              本 SOP 旨在帮助非专业人员通过“看、量、试、调”四步法快速完成专业级验收。确保每一项物资都符合《采购需求说明书》的极致标准。
+              本 SOP 旨在帮助非专业人员通过“看、量、试、调”四步法快速完成专业级验收。确保每一项物资都符合《需求说明书》的极致标准。
             </p>
           </div>
         </div>
@@ -1523,7 +1609,7 @@ const SOPDetailView = ({ onClose }: { onClose: () => void }) => {
           <div className="space-y-0.5">
             <div className="text-[10px] font-bold text-orange-800">质量异议发起机制</div>
             <p className="text-[8px] text-orange-700 leading-relaxed">
-              若发现任何不符项，请点击下方“发起异议”并拍照。系统将基于《需智采购合同》自动匹配违约条款，并通知能力提供方在 24 小时内给出整改方案。
+              若发现任何不符项，请点击下方“发起异议”并拍照。系统将基于《需智业务合同》自动匹配违约条款，并通知能力提供方在 24 小时内给出整改方案。
             </p>
           </div>
         </div>
@@ -1764,16 +1850,16 @@ const BOMStep3Card = ({ onNext }: { onNext: (config: ConfigState) => void }) => 
               <motion.div key="result" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="h-full flex flex-col gap-2">
                 <div className="flex-1 border border-gray-100 rounded-2xl bg-white p-3 flex flex-col shadow-sm">
                   <div className="text-[10px] text-gray-400 mb-2 font-black uppercase tracking-widest">BOM 全生命周期成本 (TCO) 预测</div>
-                  <div className="flex-1 flex items-end gap-3 pt-2 h-16">
+                  <div className="flex-1 flex items-end gap-3 pt-2 h-24">
                     <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                       <span className="text-[10px] text-blue-600 font-black mb-1">¥{(initialCost/10000).toFixed(1)}万</span>
                       <div className="w-full bg-blue-500 rounded-t-lg transition-all duration-700" style={{ height: `${initialCostHeight}%` }}></div>
-                      <span className="text-[9px] text-gray-400 font-bold">初期采购</span>
+                      <span className="text-[9px] text-gray-400 font-bold">初期投入</span>
                     </div>
                     <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                       <span className="text-[10px] text-blue-600 font-black mb-1">¥{(maintCost/10000).toFixed(1)}万</span>
                       <div className="w-full bg-blue-400 rounded-t-lg transition-all duration-700" style={{ height: `${maintenanceCostHeight}%` }}></div>
-                      <span className="text-[9px] text-gray-400 font-bold">5年维保</span>
+                      <span className="text-[9px] text-gray-400 font-bold">3年运维</span>
                     </div>
                     <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                       <span className="text-[10px] text-teal-600 font-black mb-1">¥{(timeCost/10000).toFixed(1)}万</span>
@@ -2193,7 +2279,7 @@ const StandardItemsList = () => {
           </button>
         </div>
         <p className="text-[10px] text-blue-700 leading-relaxed mb-2">
-          包含：无缝钢管、PE管、标准法兰等。系统已自动匹配 <span className="font-bold">GB/T 国家标准</span> 及历史采购优选品牌。
+          包含：无缝钢管、PE管、标准法兰等。系统已自动匹配 <span className="font-bold">GB/T 国家标准</span> 及历史需求优选品牌。
         </p>
         <AnimatePresence>
           {showStandardItems && (

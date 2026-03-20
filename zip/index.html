@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>智采全域闭环 - 移动端全闭环 Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        [x-cloak] { display: none !important; }
+        .phone-container { max-width: 430px; height: 95vh; margin: 1vh auto; border: 10px solid #1e293b; border-radius: 40px; overflow: hidden; position: relative; background: #f8fafc; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.4); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .chat-ai { border-radius: 4px 18px 18px 18px; }
+        .slide-up-panel { border-radius: 32px 32px 0 0; }
+        .loading-dot { animation: blink 1.4s infinite both; }
+        @keyframes blink { 0% { opacity: .2; } 20% { opacity: 1; } 100% { opacity: .2; } }
+        .biz-title { color: #1e40af; font-weight: 900; font-style: italic; border-left: 4px solid #1e40af; padding-left: 8px; margin-bottom: 1rem; font-size: 14px; }
+    </style>
+</head>
+<body class="bg-slate-200">
+
+    <div class="phone-container flex flex-col" x-data="procureApp()">
+        
+        <!-- 1. App Bar -->
+        <header class="h-14 bg-white/95 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20 border-b">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-md"><i class="fas fa-robot text-sm"></i></div>
+                <span class="font-black text-sm tracking-tighter">智采助手</span>
+            </div>
+            <div class="bg-blue-50 text-blue-600 text-[9px] font-black px-2 py-0.5 rounded-full border border-blue-100 italic">V35.0 FINAL</div>
+        </header>
+
+        <!-- 2. 对话与结果 -->
+        <main class="flex-1 overflow-y-auto no-scrollbar p-5 space-y-6">
+            <!-- AI 说明书消息 -->
+            <div class="flex items-start space-x-2 animate-fade-in">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 shrink-0 text-xs font-black">智</div>
+                <div class="chat-ai bg-white p-4 border border-slate-100 shadow-sm max-w-[90%]">
+                    <p class="text-[11px] font-bold text-slate-700 leading-relaxed mb-3">张工，已锁定《老旧小区改造需求说明书》。重点匹配了“静音、耐候”指标：</p>
+                    <div class="bg-blue-50/50 rounded-xl p-3 border border-blue-100 text-[10px] space-y-1 font-bold text-blue-800 italic">
+                        <p>#调压箱-静音优化 #流量计-1.0级精度 #PE管-寿命增强</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 扫描中动效 -->
+            <div x-show="step >= 1" class="flex items-start space-x-2 animate-fade-in">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 shrink-0 text-xs font-black">智</div>
+                <div class="chat-ai bg-white p-4 border border-slate-100 shadow-sm">
+                    <div x-show="step === 1" class="flex items-center space-x-2 text-blue-600 italic">
+                        <i class="fas fa-microchip animate-spin text-sm"></i>
+                        <span class="text-xs font-black tracking-widest uppercase">全域智能对撞中...</span>
+                    </div>
+                    <div x-show="step >= 2" class="space-y-1 text-[10px] font-bold text-emerald-600 animate-fade-in italic">
+                        <p><i class="fas fa-check-circle mr-1"></i> 已匹配北方能源/永康新奥合单机会</p>
+                        <p><i class="fas fa-check-circle mr-1"></i> 年度累计阶梯价已激活 (L4级)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 损益看板 & 清单 -->
+            <div x-show="step >= 2" class="space-y-6 animate-fade-in">
+                <div class="bg-blue-600 rounded-[2rem] p-6 text-white shadow-xl shadow-blue-200 relative overflow-hidden transition-all duration-500">
+                    <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-white opacity-5 rounded-full"></div>
+                    <p class="text-[10px] font-black uppercase opacity-60 mb-2 italic">Project Aggregation Report</p>
+                    <div class="flex items-baseline space-x-2 mb-4">
+                        <!-- 动态计算整体损益 -->
+                        <span class="text-4xl font-black font-mono tracking-tighter" x-text="'¥' + formatNum(totalSave)"></span>
+                        <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-lg font-black italic tracking-widest" x-text="'-' + savePercent + '%'"></span>
+                    </div>
+                    <div class="flex justify-between text-[10px] font-black border-t border-white/10 pt-4 opacity-80">
+                        <p x-text="'采购降本: ¥' + formatNumNoDec(totalSaveP)"></p>
+                        <p x-text="'物流红利: ¥' + formatNumNoDec(totalSaveL)"></p>
+                    </div>
+                </div>
+
+                <!-- 推荐全案原因 -->
+                <div class="bg-amber-50 p-5 rounded-[2rem] border-2 border-amber-100 italic">
+                    <p class="text-[10px] text-amber-800 leading-relaxed">
+                        <b class="text-amber-900 uppercase tracking-widest underline decoration-amber-200">全案决策建议：</b><br>
+                        针对“老旧小区”受限空间施工，本组合选择了<span class="font-black">“极速安装+全消音”</span>物料。通过聚量，您的单品价格已触底年度最低议价线。
+                    </p>
+                </div>
+
+                <!-- 商品列表 -->
+                <div class="space-y-4">
+                    <template x-for="p in products" :key="p.id">
+                        <div @click="openDetail(p)" class="bg-white rounded-[2rem] p-4 border border-slate-100 shadow-md transition active:scale-95">
+                            <div class="flex space-x-4">
+                                <div class="w-24 h-24 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0 border border-slate-50 shadow-inner">
+                                    <img :src="p.img" class="max-w-full max-h-20 mix-blend-multiply drop-shadow-lg">
+                                </div>
+                                <div class="flex-1 min-w-0 flex flex-col justify-between py-1">
+                                    <div class="flex justify-between items-start">
+                                        <h4 class="font-black text-sm text-slate-800 uppercase tracking-tighter truncate" x-text="p.name"></h4>
+                                        <!-- 每个商品都有换一换按钮 -->
+                                        <button @click.stop="openAlternatives(p)" class="text-[10px] text-blue-600 border border-blue-600 px-2 py-0.5 rounded-full shrink-0 ml-2 bg-blue-50 shadow-sm hover:bg-blue-100 transition-colors">换一换</button>
+                                    </div>
+                                    
+                                    <!-- 需求解析结果标签 (所有商品均支持) -->
+                                    <div class="relative mt-1 mb-1" x-data="{ showReqs: false }" x-show="p.requirements">
+                                        <div @click.stop="showReqs = !showReqs" class="inline-flex items-center space-x-1 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded text-[9px] font-bold cursor-pointer border border-emerald-100">
+                                            <span x-text="`符合全部${p.requirements?.length}/${p.requirements?.length}项需求`"></span>
+                                            <i class="fas fa-chevron-down text-[8px] transition-transform" :class="showReqs ? 'rotate-180' : ''"></i>
+                                        </div>
+                                        <!-- 展开的需求列表 -->
+                                        <div x-show="showReqs" @click.outside="showReqs = false" class="absolute left-0 top-full mt-2 w-48 bg-white border border-slate-100 shadow-xl rounded-lg p-3 z-20">
+                                            <div class="absolute -top-1.5 left-4 w-3 h-3 bg-white border-t border-l border-slate-100 transform rotate-45"></div>
+                                            <div class="relative z-10 space-y-2">
+                                                <template x-for="req in p.requirements">
+                                                    <div class="flex items-center space-x-2">
+                                                        <i class="fas fa-check text-emerald-500 text-[10px]"></i>
+                                                        <span class="text-[10px] text-slate-700 font-bold" x-text="req"></span>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <p class="text-[10px] text-slate-400 font-bold line-clamp-1 italic mt-1" x-text="p.layman"></p>
+                                    <div class="flex items-baseline space-x-3 mt-1">
+                                        <span class="text-lg font-black text-red-600 font-mono tracking-tighter" x-text="'¥'+p.price"></span>
+                                        <span class="text-[10px] text-slate-300 line-through italic" x-text="'¥'+p.oldPrice"></span>
+                                    </div>
+                                    <p class="text-[9px] text-emerald-600 font-black italic underline decoration-emerald-100 mt-1">分摊已省: ¥<span x-text="p.saveTotal"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </main>
+
+        <!-- 3. 固定页脚 -->
+        <footer class="bg-white border-t p-5 pb-8 shrink-0 z-30 shadow-2xl">
+            <div x-show="step === 0">
+                <button @click="confirmSpec()" class="w-full bg-blue-600 text-white py-4 rounded-full font-black text-sm shadow-xl shadow-blue-200 italic tracking-widest">确认需求说明书，开启聚合对撞</button>
+            </div>
+            <div x-show="step >= 2" class="flex items-center space-x-4">
+                <div class="flex-1">
+                    <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest italic">全案实付预估价</p>
+                    <p class="text-2xl font-black text-blue-600 font-mono tracking-tighter italic transition-all duration-500" x-text="'¥' + formatNum(totalPrice)"></p>
+                </div>
+                <button @click="alert('✅ 订单已锁定！损益已锁定。')" class="bg-slate-900 text-white px-10 py-4 rounded-full font-black text-xs uppercase italic tracking-widest shadow-lg">签订合同下单</button>
+            </div>
+        </footer>
+
+        <!-- ================= 换一换 (方案对比) ================= -->
+        <div x-show="showAlternatives" 
+             x-cloak 
+             x-transition:enter="transition ease-out duration-300 transform" 
+             x-transition:enter-start="translate-y-full" 
+             x-transition:enter-end="translate-y-0" 
+             x-transition:leave="transition ease-in duration-200 transform" 
+             x-transition:leave-start="translate-y-0" 
+             x-transition:leave-end="translate-y-full" 
+             class="absolute inset-0 z-[110] flex flex-col justify-end bg-slate-900/60 backdrop-blur-sm">
+            
+            <div class="bg-slate-100 slide-up-panel h-[95%] w-full flex flex-col overflow-hidden">
+                <!-- Header -->
+                <div class="bg-white px-6 py-4 flex justify-between items-center shrink-0 rounded-t-[32px] shadow-sm z-10">
+                    <h3 class="text-lg font-black text-slate-800">TOP方案对比情况</h3>
+                    <button @click="showAlternatives = false" class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-4">
+                    <template x-for="(alt, index) in currentAlternatives" :key="index">
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 relative overflow-hidden">
+                            <!-- Label & Desc -->
+                            <div class="text-blue-600 font-black text-sm mb-2 flex items-center space-x-2">
+                                <span x-text="alt.label"></span>
+                                <span x-show="alt.isCurrent" class="bg-blue-100 text-blue-600 text-[8px] px-1.5 py-0.5 rounded">当前推荐</span>
+                            </div>
+                            <div class="text-[10px] text-slate-600 mb-3 leading-relaxed whitespace-pre-line" x-text="alt.desc"></div>
+                            
+                            <!-- Supplier -->
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="font-black text-xs text-slate-800" x-text="alt.supplier"></span>
+                                <span class="text-[9px] border border-amber-500 text-amber-600 px-1 rounded">协议商品</span>
+                            </div>
+                            
+                            <!-- Product Info -->
+                            <div class="flex space-x-3 mb-3">
+                                <div class="w-16 h-16 bg-slate-50 rounded-lg flex items-center justify-center shrink-0 border border-slate-100">
+                                    <img :src="alt.img" class="max-w-full max-h-12 mix-blend-multiply">
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-[11px] text-slate-500 line-clamp-2 mb-1" x-text="alt.name"></h4>
+                                    <div class="text-red-600 font-black text-sm font-mono" x-text="'¥ ' + alt.price"></div>
+                                    
+                                    <!-- 验真 Buttons -->
+                                    <div class="flex space-x-2 mt-2">
+                                        <button @click.stop="activeVerifyAlt = alt; showQualityVerify = true" class="bg-blue-50 text-blue-600 border border-blue-200 py-1 px-2 rounded text-[9px] font-bold flex items-center justify-center space-x-1 hover:bg-blue-100 transition-colors">
+                                            <i class="fas fa-shield-halved"></i><span>质信验真</span>
+                                        </button>
+                                        <button @click.stop="activeVerifyAlt = alt; showPriceVerify = true" class="bg-emerald-50 text-emerald-600 border border-emerald-200 py-1 px-2 rounded text-[9px] font-bold flex items-center justify-center space-x-1 hover:bg-emerald-100 transition-colors">
+                                            <i class="fas fa-chart-simple"></i><span>价格验真</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Tags -->
+                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                <template x-for="tag in alt.tags">
+                                    <span class="bg-slate-50 text-slate-500 text-[9px] px-2 py-1 rounded border border-slate-100" x-text="tag"></span>
+                                </template>
+                            </div>
+                            
+                            <!-- Dimensions Comparison (同维度查验) -->
+                            <div class="bg-slate-50 rounded-xl p-3 space-y-2 border border-slate-100">
+                                <!-- Quality -->
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-1.5">
+                                    <span class="text-[10px] font-bold text-slate-700 w-10">质量</span>
+                                    <div class="flex-1 flex justify-between text-[9px] text-slate-500 pl-2">
+                                        <span>投诉率: <span class="font-bold text-slate-800" x-text="alt.metrics.quality.complaint"></span></span>
+                                        <span>不合格率: <span class="font-bold text-slate-800" x-text="alt.metrics.quality.defect"></span></span>
+                                    </div>
+                                </div>
+                                <!-- Delivery -->
+                                <div class="flex justify-between items-center border-b border-slate-200 pb-1.5 pt-0.5">
+                                    <span class="text-[10px] font-bold text-slate-700 w-10">交付</span>
+                                    <div class="flex-1 flex justify-between text-[9px] text-slate-500 pl-2">
+                                        <span>平均周期: <span class="font-bold text-slate-800" x-text="alt.metrics.delivery.avgTime"></span></span>
+                                        <span>超时率: <span class="font-bold text-slate-800" x-text="alt.metrics.delivery.overtime"></span></span>
+                                    </div>
+                                </div>
+                                <!-- Cost -->
+                                <div class="flex justify-between items-center pt-0.5">
+                                    <span class="text-[10px] font-bold text-slate-700 w-10">成本</span>
+                                    <div class="flex-1 flex justify-between text-[9px] text-slate-500 pl-2">
+                                        <span>物流成本: <span class="font-bold text-slate-800" x-text="alt.metrics.cost.logistics"></span></span>
+                                        <span>采购成本: <span class="font-bold text-slate-800" x-text="alt.metrics.cost.procurement"></span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Select Button -->
+                            <div class="mt-4">
+                                <button @click="selectAlternative(alt)" class="w-full py-2.5 rounded-lg font-bold text-xs transition-transform active:scale-95" :class="alt.isCurrent ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-blue-600 text-white shadow-md'">
+                                    <span x-text="alt.isCurrent ? '当前已选' : '选择此方案'"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 质信验真 Modal ================= -->
+        <div x-show="showQualityVerify" 
+             x-cloak 
+             x-transition:enter="transition ease-out duration-300 transform" 
+             x-transition:enter-start="translate-y-full" 
+             x-transition:enter-end="translate-y-0" 
+             x-transition:leave="transition ease-in duration-200 transform" 
+             x-transition:leave-start="translate-y-0" 
+             x-transition:leave-end="translate-y-full" 
+             class="absolute inset-0 z-[120] flex flex-col justify-end bg-slate-900/60 backdrop-blur-sm">
+            
+            <div class="bg-white slide-up-panel h-[85%] w-full flex flex-col overflow-hidden">
+                <!-- Header -->
+                <div class="flex justify-between items-center p-5 border-b border-slate-100 shrink-0">
+                    <h3 class="font-black text-lg text-slate-800">质信验真</h3>
+                    <div class="flex items-center space-x-4">
+                        <button class="text-blue-600 text-xs font-bold flex items-center space-x-1">
+                            <i class="fas fa-exchange-alt"></i><span>切换其他能力</span>
+                        </button>
+                        <button @click="showQualityVerify = false" class="text-slate-400 hover:text-slate-600">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Tabs -->
+                <div class="flex p-4 space-x-2 shrink-0">
+                    <button class="flex-1 py-2.5 rounded-lg font-bold text-xs transition-colors" :class="verifyTabQ === 'product' ? 'bg-blue-500 text-white shadow-md shadow-blue-200' : 'bg-slate-50 text-slate-500 border border-slate-100'" @click="verifyTabQ = 'product'">商品验真</button>
+                    <button class="flex-1 py-2.5 rounded-lg font-bold text-xs transition-colors" :class="verifyTabQ === 'supplier' ? 'bg-blue-500 text-white shadow-md shadow-blue-200' : 'bg-slate-50 text-slate-500 border border-slate-100'" @click="verifyTabQ = 'supplier'">供应商验真</button>
+                </div>
+                
+                <!-- VS Section -->
+                <div class="flex items-center justify-center space-x-3 px-4 mb-4 shrink-0">
+                    <div class="bg-blue-100 text-blue-700 px-6 py-2.5 rounded-l-xl font-black text-xs flex-1 text-center">用户需求</div>
+                    <div class="text-red-500 font-black italic text-lg">VS</div>
+                    <div class="bg-purple-100 text-purple-700 px-6 py-2.5 rounded-r-xl font-black text-xs flex-1 text-center">匹配结果</div>
+                </div>
+                
+                <!-- Table -->
+                <div class="px-4 flex-1 overflow-y-auto pb-4">
+                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                        <div class="flex bg-slate-50 border-b border-slate-200 text-[11px] font-black text-slate-600 text-center">
+                            <div class="w-1/4 py-3 border-r border-slate-200">功能信息</div>
+                            <div class="w-1/4 py-3 border-r border-slate-200">用户关注点</div>
+                            <div class="w-2/4 py-3">匹配结果</div>
+                        </div>
+                        <div class="flex text-[11px] text-slate-700 min-h-[120px]">
+                            <div class="w-1/4 p-3 border-r border-slate-200 flex items-center justify-center font-bold text-slate-800">规格型号</div>
+                            <div class="w-1/4 p-3 border-r border-slate-200 flex items-center justify-center text-slate-400">--</div>
+                            <div class="w-2/4 p-3 break-all leading-relaxed font-medium" x-text="activeVerifyAlt ? activeVerifyAlt.name + '_SDR11_白色_GB/T 15558.1_2000m³/h_120-3000m³/h_D81_D32_0.3-0.4MPa_DN600_DJ23W_300-500kPa_2.5级_0.2级_15mm_0.8MPa' : ''"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bottom Button -->
+                <div class="p-4 border-t border-slate-100 shrink-0 bg-white">
+                    <button class="w-full bg-blue-500 text-white py-3.5 rounded-full font-black text-sm shadow-lg shadow-blue-200 tracking-widest">验真助手</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 价格验真 Modal ================= -->
+        <div x-show="showPriceVerify" 
+             x-cloak 
+             x-transition:enter="transition ease-out duration-300 transform" 
+             x-transition:enter-start="translate-y-full" 
+             x-transition:enter-end="translate-y-0" 
+             x-transition:leave="transition ease-in duration-200 transform" 
+             x-transition:leave-start="translate-y-0" 
+             x-transition:leave-end="translate-y-full" 
+             class="absolute inset-0 z-[120] flex flex-col justify-end bg-slate-900/60 backdrop-blur-sm">
+            
+            <div class="bg-white slide-up-panel h-[85%] w-full flex flex-col overflow-hidden">
+                <!-- Header -->
+                <div class="flex justify-between items-center p-5 border-b border-slate-100 shrink-0">
+                    <h3 class="font-black text-lg text-slate-800">价格验真</h3>
+                    <div class="flex items-center space-x-4">
+                        <button class="text-blue-600 text-xs font-bold flex items-center space-x-1">
+                            <i class="fas fa-exchange-alt"></i><span>切换其他能力</span>
+                        </button>
+                        <button @click="showPriceVerify = false" class="text-slate-400 hover:text-slate-600">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Tabs -->
+                <div class="flex border-b border-slate-100 shrink-0">
+                    <button class="flex-1 py-4 font-bold text-sm transition-colors relative" :class="verifyTabP === 'current' ? 'text-blue-600' : 'text-slate-500'" @click="verifyTabP = 'current'">
+                        同期价格呈现
+                        <div x-show="verifyTabP === 'current'" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-blue-600 rounded-t-full"></div>
+                    </button>
+                    <button class="flex-1 py-4 font-bold text-sm transition-colors relative" :class="verifyTabP === 'history' ? 'text-blue-600' : 'text-slate-500'" @click="verifyTabP = 'history'">
+                        历史成交价
+                        <div x-show="verifyTabP === 'history'" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-blue-600 rounded-t-full"></div>
+                    </button>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto">
+                    <!-- Warning text -->
+                    <div class="m-4 p-4 bg-slate-50 text-slate-600 text-[11px] font-medium rounded-xl border border-slate-100 leading-relaxed">
+                        价格曲线为系统自动生成,受数据来源及更新影响,不保证绝对准确,仅供参考。
+                    </div>
+                    
+                    <!-- Chart Area -->
+                    <div class="px-6 mt-10 h-56 flex items-end justify-between pb-12 relative">
+                        <!-- Y axis lines and labels -->
+                        <div class="absolute inset-0 flex flex-col justify-between pb-12 z-0">
+                            <template x-for="val in [120, 100, 80, 60, 40, 20, 0]">
+                                <div class="flex items-center w-full">
+                                    <span class="text-[10px] text-slate-400 w-6 text-right mr-2 font-mono" x-text="val"></span>
+                                    <div class="flex-1 border-b border-dashed border-slate-200"></div>
+                                </div>
+                            </template>
+                            <span class="absolute -top-4 left-2 text-[10px] text-slate-400">元</span>
+                        </div>
+                        
+                        <!-- Bars -->
+                        <div class="relative z-10 flex justify-between w-full pl-10 pr-2 h-full items-end">
+                            <template x-for="(bar, idx) in [
+                                {name:'质信智购', price:113, h:'75%'}, 
+                                {name:'京东工业', price:116.39, h:'78%'}, 
+                                {name:'淘宝 1688', price:107.35, h:'70%'}, 
+                                {name:'震坤行', price:115.26, h:'77%'}, 
+                                {name:'西域商城', price:111.87, h:'74%'}, 
+                                {name:'鑫方盛商城', price:118.65, h:'80%'}
+                            ]">
+                                <div class="flex flex-col items-center w-8 relative group">
+                                    <span class="text-[9px] text-slate-600 absolute -top-6 -rotate-45 origin-bottom-left whitespace-nowrap font-mono font-bold" x-text="bar.price + '元'"></span>
+                                    <div class="w-full bg-indigo-500 rounded-t-sm transition-all duration-700 ease-out" :style="`height: ${bar.h}`"></div>
+                                    <span class="text-[10px] text-slate-600 absolute -bottom-16 -rotate-45 origin-top-left whitespace-nowrap w-20 text-right pr-2 font-medium" x-text="bar.name"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bottom Button -->
+                <div class="p-4 border-t border-slate-100 shrink-0 bg-white">
+                    <button class="w-full bg-blue-500 text-white py-3.5 rounded-full font-black text-sm shadow-lg shadow-blue-200 tracking-widest">验真助手</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 商品详情页 (像素级还原业务对账) ================= -->
+        <div x-show="showDetail" 
+             x-cloak 
+             x-transition:enter="transition ease-out duration-300 transform" 
+             x-transition:enter-start="translate-y-full" 
+             x-transition:enter-end="translate-y-0" 
+             x-transition:leave="transition ease-in duration-200 transform" 
+             x-transition:leave-start="translate-y-0" 
+             x-transition:leave-end="translate-y-full" 
+             class="absolute inset-0 z-[100] flex flex-col justify-end bg-slate-900/60 backdrop-blur-sm">
+            
+            <div class="bg-white slide-up-panel h-[90%] w-full flex flex-col p-6 overflow-hidden">
+                <!-- 关闭指示条 -->
+                <div @click="showDetail = false" class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-8 cursor-pointer"></div>
+                
+                <div class="flex-1 overflow-y-auto no-scrollbar space-y-10 pb-20 italic">
+                    <!-- 商品基础 -->
+                    <div class="flex flex-col items-center">
+                        <div class="w-48 h-48 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-6 shadow-inner border border-slate-50">
+                            <img :src="activeProduct?.img" class="max-w-full max-h-40 mix-blend-multiply drop-shadow-2xl">
+                        </div>
+                        <h3 class="text-2xl font-black text-slate-900 text-center uppercase tracking-tighter italic" x-text="activeProduct?.name"></h3>
+                        <div class="mt-4 flex items-baseline space-x-4">
+                            <span class="text-4xl font-black text-red-600 font-mono tracking-tighter" x-text="'¥'+activeProduct?.price"></span>
+                            <span class="text-sm text-slate-300 line-through font-bold" x-text="'¥'+activeProduct?.oldPrice"></span>
+                        </div>
+                    </div>
+
+                    <!-- 匹配原因详情 (业务对账) -->
+                    <div class="space-y-6">
+                        <h4 class="biz-title tracking-widest uppercase">匹配原因详情 (业务对账)</h4>
+                        <div class="space-y-4">
+                            <template x-for="info in activeProduct?.details">
+                                <div class="bg-blue-50/50 p-6 rounded-[2rem] border border-blue-100 shadow-sm">
+                                    <p class="text-xs font-black text-blue-900 mb-2 uppercase underline decoration-blue-200" x-text="info.title"></p>
+                                    <p class="text-[11px] text-slate-600 font-bold leading-relaxed italic" x-text="info.desc"></p>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- 核心四维保障矩阵 -->
+                    <div class="bg-slate-50/80 rounded-[2.5rem] p-8 grid grid-cols-2 gap-x-10 gap-y-10 border border-slate-100 shadow-inner">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-truck text-blue-600 text-lg"></i>
+                            <div class="text-[11px] font-black text-slate-800">平均 48H 交付</div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-shield-halved text-blue-600 text-lg"></i>
+                            <div class="text-[11px] font-black text-slate-800">10年质保/防腐</div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-award text-blue-600 text-lg"></i>
+                            <div class="text-[11px] font-black text-slate-800 uppercase">高于同行 8% 及时率</div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-arrows-rotate text-blue-600 text-lg"></i>
+                            <div class="text-[11px] font-black text-slate-800">支持跨主体退换</div>
+                        </div>
+                    </div>
+
+                    <!-- 损益穿透 -->
+                    <div class="bg-blue-900 p-6 rounded-3xl text-white italic">
+                        <p class="text-[9px] uppercase font-black opacity-50 mb-3 tracking-widest underline decoration-white/20">Itemized Savings Breakdown</p>
+                        <div class="flex justify-between text-xs font-black">
+                            <p>采购单价降低: <span class="text-emerald-400" x-text="'¥'+activeProduct?.saveP"></span></p>
+                            <p>物流费合并省: <span class="text-emerald-400" x-text="'¥'+activeProduct?.saveL"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <button @click="showDetail = false" class="w-full bg-slate-900 text-white py-5 rounded-full font-black shadow-xl shrink-0 italic tracking-widest uppercase">确认返回全案清单</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function procureApp() {
+            return {
+                step: 0, 
+                showDetail: false, 
+                showAlternatives: false,
+                showQualityVerify: false,
+                showPriceVerify: false,
+                verifyTabQ: 'product',
+                verifyTabP: 'current',
+                activeVerifyAlt: null,
+                activeProduct: null,
+                currentAltProductId: null,
+                currentAlternatives: [],
+                products: [],
+                
+                // 辅助函数：解析带逗号的金额字符串为数字
+                parseNum(str) { return parseFloat(String(str).replace(/,/g, '')) || 0; },
+                // 辅助函数：格式化数字为带逗号的金额字符串（保留两位小数）
+                formatNum(num) { return num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}); },
+                // 辅助函数：格式化数字为带逗号的金额字符串（无小数）
+                formatNumNoDec(num) { return num.toLocaleString('en-US', {maximumFractionDigits: 0}); },
+
+                // 动态计算整体损益 (基于当前 products 数组)
+                get totalOldPrice() { return this.products.reduce((sum, p) => sum + this.parseNum(p.oldPrice), 0); },
+                get totalPrice() { return this.products.reduce((sum, p) => sum + this.parseNum(p.price), 0); },
+                get totalSave() { return this.totalOldPrice - this.totalPrice; },
+                get savePercent() { return this.totalOldPrice ? ((this.totalSave / this.totalOldPrice) * 100).toFixed(1) : 0; },
+                get totalSaveP() { return this.products.reduce((sum, p) => sum + this.parseNum(p.saveP), 0); },
+                get totalSaveL() { return this.products.reduce((sum, p) => sum + this.parseNum(p.saveL), 0); },
+
+                // 所有商品的替换方案库 (包含完整的损益和详情数据)
+                allAlternatives: {
+                    'p1': [
+                        {
+                            isCurrent: true,
+                            label: '首选·全面优',
+                            desc: '适用：追求综合性能与稳定交付的用户，综合排序最高。',
+                            name: '全静音智能调压箱 RTZ-A',
+                            supplier: '温州木目禾工艺品有限公司',
+                            img: 'https://img.alicdn.com/imgextra/i3/2137682393/O1CN01SjM7S21P4NqKscMvJ_!!2137682393.jpg',
+                            price: '12,500', oldPrice: '14,800', saveTotal: '2,300', saveP: '2,000', saveL: '300',
+                            layman: '不仅静音不扰民，且带防爆伴热系统，极寒环境下供气极稳。',
+                            requirements: ['气压调节器', '建筑用途', '区域柜', '城市燃气项目', '压力调节设施'],
+                            tags: ['零质量事故', '准时率100%', '交付周期明确'],
+                            metrics: { quality: { complaint: '0.1%', defect: '0.05%' }, delivery: { avgTime: '3天', overtime: '0%' }, cost: { logistics: '¥300', procurement: '¥12,500' } },
+                            details: [
+                                { title: '质量：全静音声学迷宫技术', desc: '基于“老旧小区”场景增强出的静音标准。顺滑度验证优于行业 15%。' },
+                                { title: '交付：平均 3 天到货', desc: '该品牌为华东区直供商。历史 DSR 及时率 100%，比行业平均周期缩短 5 天。' }
+                            ]
+                        },
+                        {
+                            isCurrent: false,
+                            label: '备选·性价比',
+                            desc: '适用：预算有限，对价格敏感度较高的项目。',
+                            name: '经济型燃气调压箱_500m³/h',
+                            supplier: '河北正鑫燃气设备有限公司',
+                            img: 'https://img.alicdn.com/imgextra/i4/136006579/O1CN01fN6G4X1pE6tN5S8hR_!!136006579.jpg',
+                            price: '8,900', oldPrice: '10,000', saveTotal: '1,100', saveP: '900', saveL: '200',
+                            layman: '价格优势明显，适合预算有限项目，满足基础国标要求。',
+                            requirements: ['气压调节器', '建筑用途', '区域柜', '城市燃气项目', '压力调节设施'],
+                            tags: ['价格最低', '国标认证', '现货供应'],
+                            metrics: { quality: { complaint: '0.5%', defect: '0.2%' }, delivery: { avgTime: '5天', overtime: '2%' }, cost: { logistics: '¥450', procurement: '¥8,900' } },
+                            details: [
+                                { title: '成本：极致性价比', desc: '去除冗余功能，保留核心调压模块，采购成本直降30%。' },
+                                { title: '质量：国标基础保障', desc: '通过国家特种设备检测，满足常规低压管网安全运行要求。' }
+                            ]
+                        },
+                        {
+                            isCurrent: false,
+                            label: '备选·快交付',
+                            desc: '适用：工期紧张，急需现货安装的项目。',
+                            name: '速装型智能调压柜_区域型',
+                            supplier: '浙江新奥燃气设备制造厂',
+                            img: 'https://img.alicdn.com/imgextra/i2/2215286591030/O1CN0163351k259n5G8R8Xy_!!2215286591030.jpg',
+                            price: '13,200', oldPrice: '15,000', saveTotal: '1,800', saveP: '1,500', saveL: '300',
+                            layman: '华东仓直发，次日达，适合工期极度紧张的抢修或加急项目。',
+                            requirements: ['气压调节器', '建筑用途', '区域柜', '城市燃气项目', '压力调节设施'],
+                            tags: ['次日达', '华东直发', '知名品牌'],
+                            metrics: { quality: { complaint: '0.2%', defect: '0.1%' }, delivery: { avgTime: '1天', overtime: '0%' }, cost: { logistics: '¥200', procurement: '¥13,200' } },
+                            details: [
+                                { title: '交付：华东仓极速响应', desc: '本地化仓储网络覆盖，下单后24小时内送达施工现场。' },
+                                { title: '安装：模块化速装设计', desc: '出厂前完成90%管路预制，现场接管时间缩短一半。' }
+                            ]
+                        }
+                    ],
+                    'p2': [
+                        {
+                            isCurrent: true,
+                            label: '首选·全面优',
+                            desc: '适用：追求综合性能与稳定交付的用户，综合排序最高。',
+                            name: 'NB-IoT 工业流量计 G100',
+                            supplier: '杭州先锋电子技术股份有限公司',
+                            img: 'https://img.alicdn.com/imgextra/i2/2215286591030/O1CN0163351k259n5G8R8Xy_!!2215286591030.jpg',
+                            price: '8,400', oldPrice: '9,200', saveTotal: '800', saveP: '750', saveL: '50',
+                            layman: '高精度 1.0 级计量，再小的流量也能精准对账，挽回“供销差”损失。',
+                            requirements: ['高精度计量', '工业用途', '物联网通讯', '防爆设计', '数据远传'],
+                            tags: ['1.0级精度', 'L4级协议价', '物联网远传'],
+                            metrics: { quality: { complaint: '0.05%', defect: '0.01%' }, delivery: { avgTime: '2天', overtime: '0%' }, cost: { logistics: '¥50', procurement: '¥8,400' } },
+                            details: [
+                                { title: '性能：1.0级高精度计量模块', desc: '符合“高精度对账”增强指标。耐磨损验证通过 5000 小时压力测试。' },
+                                { title: '累计：全渠道协议价对冲', desc: '年度累计采购量已达 5,420 台。本次单笔采购自动继承集团 L4 级最低战略议价成果。' }
+                            ]
+                        },
+                        {
+                            isCurrent: false,
+                            label: '备选·高质量',
+                            desc: '适用：对计量精度和设备寿命有极高要求的核心节点。',
+                            name: '罗茨流量计_智能型_高压防爆',
+                            supplier: '苍县仪表厂',
+                            img: 'https://img.alicdn.com/imgextra/i3/2137682393/O1CN01SjM7S21P4NqKscMvJ_!!2137682393.jpg',
+                            price: '11,500', oldPrice: '12,500', saveTotal: '1,000', saveP: '900', saveL: '100',
+                            layman: '进口传感器，15年超长寿命，适合核心高压节点，极低维护率。',
+                            requirements: ['高精度计量', '工业用途', '物联网通讯', '防爆设计', '数据远传'],
+                            tags: ['进口传感', '15年寿命', '高压防爆'],
+                            metrics: { quality: { complaint: '0.01%', defect: '0.00%' }, delivery: { avgTime: '15天', overtime: '5%' }, cost: { logistics: '¥120', procurement: '¥11,500' } },
+                            details: [
+                                { title: '质量：航空级进口传感器', desc: '核心部件原装进口，抗脉动流干扰能力极强，确保0.5级超高精度。' },
+                                { title: '寿命：15年免维护设计', desc: '自润滑轴承与全密封防腐壳体，设计使用寿命远超国标。' }
+                            ]
+                        },
+                        {
+                            isCurrent: false,
+                            label: '备选·经济型',
+                            desc: '适用：普通工商业用户，满足基础计量需求。',
+                            name: '膜式燃气表_G65_带远传',
+                            supplier: '浙江威星智能仪表股份有限公司',
+                            img: 'https://img.alicdn.com/imgextra/i4/136006579/O1CN01fN6G4X1pE6tN5S8hR_!!136006579.jpg',
+                            price: '5,200', oldPrice: '6,000', saveTotal: '800', saveP: '700', saveL: '100',
+                            layman: '1.5级精度，经济适用，适合大批量基础部署，回本周期极短。',
+                            requirements: ['高精度计量', '工业用途', '物联网通讯', '防爆设计', '数据远传'],
+                            tags: ['1.5级精度', '经济适用', '现货充足'],
+                            metrics: { quality: { complaint: '0.8%', defect: '0.3%' }, delivery: { avgTime: '3天', overtime: '1%' }, cost: { logistics: '¥80', procurement: '¥5,200' } },
+                            details: [
+                                { title: '成本：大批量部署首选', desc: '成熟的膜式计量技术，成本控制极佳，适合对精度要求非极致的普通工商业网点。' },
+                                { title: '交付：标准化现货库存', desc: '常规型号常年备有大量现货，支持随时调拨，满足突发性安装需求。' }
+                            ]
+                        }
+                    ],
+                    'p3': [
+                        {
+                            isCurrent: true,
+                            label: '首选·全面优',
+                            desc: '适用：追求综合性能与稳定交付的用户，综合排序最高。',
+                            name: '燃气专用 PE100 管材 D110',
+                            supplier: '沧州明珠塑料股份有限公司',
+                            img: 'https://img.alicdn.com/imgextra/i4/136006579/O1CN01fN6G4X1pE6tN5S8hR_!!136006579.jpg',
+                            price: '7,420', oldPrice: '8,800', saveTotal: '1,380', saveP: '900', saveL: '480',
+                            layman: '100% 纯原生料，埋地 50 年不爆不漏，极具抗腐蚀性。本次与永康合单，运费已减。',
+                            requirements: ['耐腐蚀', '地下管网', 'PE100材质', '使用寿命50年', 'SDR11标准'],
+                            tags: ['原生料', '合单免邮', '50年寿命'],
+                            metrics: { quality: { complaint: '0.02%', defect: '0.01%' }, delivery: { avgTime: '4天', overtime: '0%' }, cost: { logistics: '¥150(合单)', procurement: '¥7,420' } },
+                            details: [
+                                { title: '质量：原生料耐腐蚀寿命保障', desc: '耐环境应力开裂性能优异。使用寿命指标锁定 ≥50年，极大地摊薄了项目的全生命周期维护成本。' },
+                                { title: '物流：跨主体合流损益红利', desc: '系统对撞出萧山与永康同周五交付窗口。通过干线物流合包，单箱运费下降达 32%。' }
+                            ]
+                        },
+                        {
+                            isCurrent: false,
+                            label: '备选·高强度',
+                            desc: '适用：地质条件复杂或承压要求高的特殊路段。',
+                            name: '钢丝网骨架塑料复合管 D110',
+                            supplier: '亚大塑料制品有限公司',
+                            img: 'https://img.alicdn.com/imgextra/i2/2215286591030/O1CN0163351k259n5G8R8Xy_!!2215286591030.jpg',
+                            price: '9,800', oldPrice: '11,000', saveTotal: '1,200', saveP: '1,000', saveL: '200',
+                            layman: '钢丝网骨架增强，抗沉降能力极强，适合地质松软或重载交通路段。',
+                            requirements: ['耐腐蚀', '地下管网', 'PE100材质', '使用寿命50年', 'SDR11标准'],
+                            tags: ['抗沉降', '高承压', '复合材料'],
+                            metrics: { quality: { complaint: '0.00%', defect: '0.00%' }, delivery: { avgTime: '7天', overtime: '2%' }, cost: { logistics: '¥400', procurement: '¥9,800' } },
+                            details: [
+                                { title: '性能：超强抗沉降与承压', desc: '内嵌高强度钢丝网骨架，环刚度远超普通纯PE管，完美应对老旧小区复杂地质及重载车辆碾压。' },
+                                { title: '安全：双面防腐不脱层', desc: '内外层PE与钢丝网通过高性能粘接树脂完美融合，杜绝脱层风险，确保燃气输送绝对安全。' }
+                            ]
+                        },
+                        {
+                            isCurrent: false,
+                            label: '备选·经济型',
+                            desc: '适用：低压庭院管网或预算严格受限的项目。',
+                            name: 'PE80 燃气管材 D110',
+                            supplier: '浙江伟星新型建材股份有限公司',
+                            img: 'https://img.alicdn.com/imgextra/i3/2137682393/O1CN01SjM7S21P4NqKscMvJ_!!2137682393.jpg',
+                            price: '5,900', oldPrice: '6,800', saveTotal: '900', saveP: '700', saveL: '200',
+                            layman: 'PE80材质，本地直供当日达，极具价格优势，适合低压庭院末端。',
+                            requirements: ['耐腐蚀', '地下管网', 'PE100材质', '使用寿命50年', 'SDR11标准'],
+                            tags: ['PE80', '本地直供', '价格极低'],
+                            metrics: { quality: { complaint: '1.2%', defect: '0.5%' }, delivery: { avgTime: '1天', overtime: '0%' }, cost: { logistics: '¥80', procurement: '¥5,900' } },
+                            details: [
+                                { title: '成本：末端管网经济之选', desc: '针对低压庭院管网特性，采用高性价比PE80材质，在满足安全标准前提下最大化压缩管材成本。' },
+                                { title: '交付：同城极速响应', desc: '依托本地化生产基地，实现同城当日达，彻底消除管材等待造成的窝工损失。' }
+                            ]
+                        }
+                    ]
+                },
+
+                // 初始化：从 allAlternatives 中提取 isCurrent 为 true 的商品作为主列表
+                init() {
+                    this.updateProducts();
+                },
+                
+                updateProducts() {
+                    this.products = Object.keys(this.allAlternatives).map(id => {
+                        let currentAlt = this.allAlternatives[id].find(a => a.isCurrent);
+                        return { id: id, ...currentAlt };
+                    });
+                },
+
+                confirmSpec() { this.step = 1; setTimeout(() => { this.step = 2; }, 2000); },
+                openDetail(p) { this.activeProduct = p; this.showDetail = true; },
+                
+                openAlternatives(p) {
+                    this.currentAltProductId = p.id;
+                    this.currentAlternatives = this.allAlternatives[p.id];
+                    this.showAlternatives = true;
+                },
+
+                selectAlternative(alt) {
+                    if (alt.isCurrent) return;
+                    
+                    // 更新 allAlternatives 状态
+                    this.allAlternatives[this.currentAltProductId].forEach(a => a.isCurrent = false);
+                    alt.isCurrent = true;
+                    
+                    // 重新生成主列表，触发 Alpine 的响应式更新（包括总价、损益等）
+                    this.updateProducts();
+                    
+                    this.showAlternatives = false;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
