@@ -458,21 +458,33 @@ const Step1ConfirmCard = ({ households, usage, business1, business2, onConfirm }
             <div className="grid grid-cols-2 gap-2">
               {viewMode === 'business' ? (
                 <>
-                  <div className="bg-white p-2 rounded border border-gray-100">
+                  <div className="bg-white p-2 rounded border border-gray-100 relative overflow-hidden group">
                     <div className="text-[10px] font-bold text-gray-900">高强度结构</div>
                     <div className="text-[8px] text-gray-400">保障长期运行不形变</div>
+                    <div className="absolute top-0 right-0 bg-blue-50 text-blue-600 text-[7px] px-1 py-0.5 rounded-bl font-black tracking-tighter border-l border-b border-blue-100 shadow-sm flex items-center gap-0.5">
+                      <TrendingUp size={6} /> 历史数据决策: 92%
+                    </div>
                   </div>
-                  <div className="bg-white p-2 rounded border border-gray-100">
+                  <div className="bg-white p-2 rounded border border-gray-100 relative overflow-hidden group">
                     <div className="text-[10px] font-bold text-gray-900">极强防腐</div>
                     <div className="text-[8px] text-gray-400">适应潮湿/地下环境</div>
+                    <div className="absolute top-0 right-0 bg-blue-50 text-blue-600 text-[7px] px-1 py-0.5 rounded-bl font-black tracking-tighter border-l border-b border-blue-100 shadow-sm flex items-center gap-0.5">
+                      <TrendingUp size={6} /> 历史数据决策: 88%
+                    </div>
                   </div>
-                  <div className="bg-white p-2 rounded border border-gray-100">
+                  <div className="bg-white p-2 rounded border border-gray-100 relative overflow-hidden group">
                     <div className="text-[10px] font-bold text-gray-900">标准承压</div>
                     <div className="text-[8px] text-gray-400">符合国家燃气安全标准</div>
+                    <div className="absolute top-0 right-0 bg-emerald-50 text-emerald-600 text-[7px] px-1 py-0.5 rounded-bl font-black tracking-tighter border-l border-b border-emerald-100 shadow-sm flex items-center gap-0.5">
+                      <Check size={6} /> 历史数据决策: 100%
+                    </div>
                   </div>
-                  <div className="bg-white p-2 rounded border border-gray-100">
+                  <div className="bg-white p-2 rounded border border-gray-100 relative overflow-hidden group">
                     <div className="text-[10px] font-bold text-gray-900">全天候防护</div>
                     <div className="text-[8px] text-gray-400">无惧暴雨/沙尘工况</div>
+                    <div className="absolute top-0 right-0 bg-blue-50 text-blue-600 text-[7px] px-1 py-0.5 rounded-bl font-black tracking-tighter border-l border-b border-blue-100 shadow-sm flex items-center gap-0.5">
+                      <TrendingUp size={6} /> 历史数据决策: 85%
+                    </div>
                   </div>
                 </>
               ) : (
@@ -1448,10 +1460,22 @@ const UnifiedReviewDashboard = ({ scenarios, onConfirm, isAuto }: { scenarios: S
                     </div>
                     
                     <div className="space-y-1">
-                      <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">{viewMode === 'business' ? '业务能力需求' : '核心能力规格'}</div>
+                      <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider flex justify-between items-center">
+                        <span>{viewMode === 'business' ? '业务能力需求' : '核心能力规格'}</span>
+                        <span className="text-[7px] font-black text-blue-500 flex items-center gap-0.5 bg-blue-50 px-1 rounded border border-blue-100">
+                          <TrendingUp size={6} /> 历史数据决策参考已开启
+                        </span>
+                      </div>
                       <div className="flex flex-wrap gap-1">
                         {(viewMode === 'business' ? items[activeTab].businessSpecs : items[activeTab].technicalSpecs).map((spec, i) => (
-                          <span key={i} className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-[10px] border border-blue-100">{spec}</span>
+                          <div key={i} className="relative group">
+                            <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-[10px] border border-blue-100 block">
+                              {spec}
+                            </span>
+                            <div className="absolute -top-1 -right-1 bg-blue-600 text-white text-[6px] px-1 rounded-full font-black shadow-sm border border-white scale-75 origin-bottom-left">
+                              {85 + (i * 3) % 15}%
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </div>
