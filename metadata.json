@@ -1,5 +1,5 @@
 {
-  "name": "需智 - appV1.3",
-  "description": "从需求侧出发，将非专业业务场景需求精准解析为专业采购能力要求，提供行业专家级知识模型推演与需求说明书生成。",
+  "name": "需智-ap",
+  "description": "采购供应链 AI 引擎",
   "requestFramePermissions": []
 }
